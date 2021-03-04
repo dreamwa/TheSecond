@@ -2,6 +2,9 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
 }
+configurations {
+    ktlint
+}
 
 android {
     compileSdkVersion 30
@@ -53,6 +56,7 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerVersion "1.4.21-2"
     }
 
     packagingOptions {
@@ -78,4 +82,15 @@ dependencies {
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha02'
+    ktlint "com.pinterest:ktlint:0.40.0"
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha03"
+
+}
+task ktlintFormat(type: JavaExec, group: "formatting") {
+    description = "Fix Kotlin code style deviations."
+    classpath = configurations.ktlint
+    main = "com.pinterest.ktlint.Main"
+    args "-F", "src/**/*.kt"
 }
