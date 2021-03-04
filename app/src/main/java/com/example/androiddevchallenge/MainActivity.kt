@@ -15,35 +15,41 @@
  */
 package com.example.androiddevchallenge
 
-import android.os.*
-import android.util.Log
+import android.os.Build
+import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.*
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.*
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.androiddevchallenge.ui.theme.MyTheme
-import java.util.*
-
+import java.util.Timer
+import java.util.TimerTask
 
 class MainActivity : AppCompatActivity() {
     var content by mutableStateOf(0f)
@@ -54,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     val imageWidth = 30
     val strokWidth = 10f
 
-    //状态
+    // 状态
     var isStarted by mutableStateOf(false)
 
     lateinit var timer: Timer
@@ -66,7 +72,6 @@ class MainActivity : AppCompatActivity() {
         val displayWidth = windowManager.defaultDisplay.width
         val des = resources.displayMetrics.density
 
-
         setContent {
             MyTheme {
 
@@ -76,43 +81,49 @@ class MainActivity : AppCompatActivity() {
                             .fillMaxWidth()
                             .height(300.dp)
                     ) {
-                        Canvas(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp), onDraw = {
+                        Canvas(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp),
+                            onDraw = {
 
-                            drawArc(
-                                color = Color.Black,
-                                startAngle = 180f,
-                                sweepAngle = 360f,
-                                useCenter = false,
-                                size = Size(
-                                    (radius * 2).dp.value * des,
-                                    (radius * 2).dp.value * des
-                                ),
-                                style = Stroke(width = strokWidth),
-                                topLeft = Offset((displayWidth - radius * des * 2) / 2, 30f),
-
-                                )
-                        })
-
-                        Canvas(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp), onDraw = {
-
-                            drawArc(
-                                color = Color.Red,
-                                startAngle = -90f,
-                                sweepAngle = content,
-                                useCenter = false,
-                                size = Size(
-                                    (radius * 2).dp.value * des,
-                                    (radius * 2).dp.value * des
-                                ),
-                                style = Stroke(width = strokWidth),
-                                topLeft = Offset((displayWidth - radius * des * 2) / 2, 30f),
+                                drawArc(
+                                    color = Color.Black,
+                                    startAngle = 180f,
+                                    sweepAngle = 360f,
+                                    useCenter = false,
+                                    size = Size(
+                                        (radius * 2).dp.value * des,
+                                        (radius * 2).dp.value * des
+                                    ),
+                                    style = Stroke(width = strokWidth),
+                                    topLeft = Offset((displayWidth - radius * des * 2) / 2, 30f),
 
                                 )
-                        })
+                            }
+                        )
+
+                        Canvas(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            onDraw = {
+
+                                drawArc(
+                                    color = Color.Red,
+                                    startAngle = -90f,
+                                    sweepAngle = content,
+                                    useCenter = false,
+                                    size = Size(
+                                        (radius * 2).dp.value * des,
+                                        (radius * 2).dp.value * des
+                                    ),
+                                    style = Stroke(width = strokWidth),
+                                    topLeft = Offset((displayWidth - radius * des * 2) / 2, 30f),
+
+                                )
+                            }
+                        )
                         Text(
                             text = time.toString(), color = Color.Black,
                             modifier = Modifier
@@ -123,7 +134,6 @@ class MainActivity : AppCompatActivity() {
                             textAlign = TextAlign.Center,
                         )
                     }
-
 
                     ConstraintLayout(
                         modifier = Modifier
@@ -148,8 +158,8 @@ class MainActivity : AppCompatActivity() {
                                 .constrainAs(image1) {
                                     start.linkTo(parent.start, margin = 30.dp)
                                     top.linkTo(parent.top)
-
-                                })
+                                }
+                        )
 
                         Image(
                             painter = painterResource(id = R.mipmap.iv_start),
@@ -163,18 +173,20 @@ class MainActivity : AppCompatActivity() {
                                     if (isStarted) {
                                         timer = Timer()
                                         currentTime = time
-                                        timer.schedule(object : TimerTask() {
-                                            override fun run() {
-                                                if (time > 0) {
-                                                    content += 360f / currentTime
-                                                    time--
+                                        timer.schedule(
+                                            object : TimerTask() {
+                                                override fun run() {
+                                                    if (time > 0) {
+                                                        content += 360f / currentTime
+                                                        time--
+                                                    }
+                                                    if (time == 0) {
+                                                        timer.cancel()
+                                                    }
                                                 }
-                                                if (time == 0) {
-                                                    timer.cancel()
-                                                }
-
-                                            }
-                                        }, 1000, 1000)
+                                            },
+                                            1000, 1000
+                                        )
                                     } else {
                                         timer.cancel()
                                     }
@@ -184,8 +196,8 @@ class MainActivity : AppCompatActivity() {
                                     end.linkTo(parent.end)
                                     top.linkTo(parent.top)
                                     centerHorizontallyTo(parent)
-
-                                })
+                                }
+                        )
 
                         Image(
                             painter = painterResource(id = R.mipmap.iv_add),
@@ -204,21 +216,12 @@ class MainActivity : AppCompatActivity() {
                                 .constrainAs(image3) {
                                     end.linkTo(parent.end, margin = 30.dp)
                                     top.linkTo(parent.top)
-
-
-                                })
-
-
+                                }
+                        )
                     }
-
-
                 }
-
-
             }
         }
-
-
     }
 }
 
@@ -245,6 +248,3 @@ fun DarkPreview() {
         MyApp(10)
     }
 }
-
-
-
